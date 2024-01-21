@@ -84,6 +84,35 @@ func parseJSON2(filename string) {
 				continue
 			}
 			if unicode.IsDigit(readRune) || unicode.IsLetter(readRune) {
+				if char == "t" || char == "f" {
+					guessBool := char
+					for {
+						gbCharRaw, _, _ := reader.ReadRune()
+						gbChar := string(gbCharRaw)
+						if !unicode.IsLetter(gbCharRaw) {
+							break
+						}
+						guessBool += gbChar
+					}
+					if guessBool == "true" || guessBool == "false" {
+						fmt.Println("got a boolean", guessBool)
+						continue
+					}
+				} else if char == "n" {
+					guessNull := char
+					for {
+						gbCharRaw, _, _ := reader.ReadRune()
+						gbChar := string(gbCharRaw)
+						if !unicode.IsLetter(gbCharRaw) {
+							break
+						}
+						guessNull += gbChar
+					}
+					if guessNull == "null" {
+						fmt.Println("got a null", guessNull)
+						continue
+					}
+				}
 				// letters and symbols only allowed inside ""
 				if !insideName && !insideValue {
 					invalid = true
