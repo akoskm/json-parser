@@ -27,6 +27,7 @@ func parseJSON2(filename string) (bool, error) {
 	invalid := false
 	lineCount := 1
 	var objectStack []bool
+	var arrayStack []bool
 	for {
 		if invalid {
 			msg := fmt.Sprintf("unexpected character %v on line %v", previousChar, lineCount)
@@ -42,6 +43,9 @@ func parseJSON2(filename string) (bool, error) {
 			}
 			if len(objectStack) != 0 {
 				return false, errors.New("object is not closed")
+			}
+			if len(arrayStack) != 0 {
+				return false, errors.New("array is not closed")
 			}
 			break
 		}
@@ -69,6 +73,19 @@ func parseJSON2(filename string) (bool, error) {
 			}
 			if len(objectStack) > 0 {
 				objectStack = objectStack[:len(objectStack)-1]
+			} else {
+				fmt.Println("no matching {")
+				invalid = true
+			}
+		case "[":
+			arrayStack = append(arrayStack, true)
+		case "]":
+			if previousChar == "," {
+				fmt.Println("no, after the last object")
+				invalid = true
+			}
+			if len(arrayStack) > 0 {
+				arrayStack = arrayStack[:len(arrayStack)-1]
 			} else {
 				fmt.Println("no matching {")
 				invalid = true

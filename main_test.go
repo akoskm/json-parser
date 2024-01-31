@@ -74,10 +74,15 @@ func TestMainStep5Valid(t *testing.T) {
 
 func TestMainStep5Invalid(t *testing.T) {
 	t.Run("parseJSON2", func(t *testing.T) {
-		expected := "object is not closed"
+		expected1 := "object is not closed"
+		expected2 := "array is not closed"
 		_, err := parseJSON2("./tests/step5/invalid.json")
-		if err.Error() != expected {
-			t.Errorf("Expected error to be %s, got %v", expected, err)
+		if err.Error() != expected1 {
+			t.Errorf("Expected error to be %s, got %v", expected1, err)
+		}
+		_, err2 := parseJSON2("./tests/step5/invalid2.json")
+		if err2.Error() != expected2 {
+			t.Errorf("Expected error to be %s, got %v", expected2, err2)
 		}
 	})
 }
