@@ -13,13 +13,12 @@ import (
 func parseJSON2(filename string) (bool, error) {
 	file, error := os.Open(filename)
 	if error != nil {
+		fmt.Println(error)
 		os.Exit(1)
 	}
 	defer file.Close()
 
 	reader := bufio.NewReader(file)
-	beginObject := false
-	endObject := false
 	insideName := false
 	insideValue := false
 	name := ""
@@ -27,6 +26,7 @@ func parseJSON2(filename string) (bool, error) {
 	previousChar := ""
 	invalid := false
 	lineCount := 1
+	var objectStack []bool
 	for {
 		if invalid {
 			msg := fmt.Sprintf("unexpected character %v on line %v", previousChar, lineCount)
@@ -36,7 +36,12 @@ func parseJSON2(filename string) (bool, error) {
 
 		if err != nil {
 			if err != io.EOF {
+				fmt.Println(err)
 			} else {
+				fmt.Println("finished parsing")
+			}
+			if len(objectStack) != 0 {
+				return false, errors.New("object is not closed")
 			}
 			break
 		}
@@ -56,12 +61,18 @@ func parseJSON2(filename string) (bool, error) {
 
 		switch char {
 		case "{":
-			beginObject = true
+			objectStack = append(objectStack, true)
 		case "}":
 			if previousChar == "," {
+				fmt.Println("no, after the last object")
 				invalid = true
 			}
-			endObject = true
+			if len(objectStack) > 0 {
+				objectStack = objectStack[:len(objectStack)-1]
+			} else {
+				fmt.Println("no matching {")
+				invalid = true
+			}
 		case "\"":
 			result := ""
 			for {
@@ -72,6 +83,7 @@ func parseJSON2(filename string) (bool, error) {
 				}
 				result += parsedChar
 			}
+			fmt.Println("found name or value", result)
 		default:
 			if unicode.IsSpace(readRune) {
 				continue
@@ -88,6 +100,7 @@ func parseJSON2(filename string) (bool, error) {
 						guessBool += gbChar
 					}
 					if guessBool == "true" || guessBool == "false" {
+						fmt.Println("got a boolean", guessBool)
 						continue
 					}
 				} else if char == "n" {
@@ -101,6 +114,7 @@ func parseJSON2(filename string) (bool, error) {
 						guessNull += gbChar
 					}
 					if guessNull == "null" {
+						fmt.Println("got a null", guessNull)
 						continue
 					}
 				} else if unicode.IsDigit(readRune) {
@@ -115,6 +129,7 @@ func parseJSON2(filename string) (bool, error) {
 					}
 					// check if guessNumber is a number
 					if _, err := strconv.Atoi(guessNumber); err == nil {
+						fmt.Printf("%q looks like a number.\n", guessNumber)
 						continue
 					}
 				}
@@ -126,8 +141,6 @@ func parseJSON2(filename string) (bool, error) {
 		}
 		previousChar = char
 	}
-	if beginObject == false || endObject == false {
-	}
 	return true, nil
 }
 
@@ -135,6 +148,7 @@ func main() {
 	args := os.Args[1:]
 
 	if len(args) < 1 {
+		fmt.Println("must provide a filename")
 		os.Exit(1)
 	}
 
@@ -142,6 +156,7 @@ func main() {
 
 	_, err := parseJSON2(filename)
 	if err != nil {
+		fmt.Println(err)
 		os.Exit(1)
 	}
 }

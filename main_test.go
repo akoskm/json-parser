@@ -65,3 +65,19 @@ func TestMainStep4Invalid(t *testing.T) {
 		}
 	})
 }
+
+func TestMainStep5Valid(t *testing.T) {
+	t.Run("parseJSON2", func(t *testing.T) {
+		parseJSON2("./tests/step5/valid.json")
+	})
+}
+
+func TestMainStep5Invalid(t *testing.T) {
+	t.Run("parseJSON2", func(t *testing.T) {
+		expected := "object is not closed"
+		_, err := parseJSON2("./tests/step5/invalid.json")
+		if err.Error() != expected {
+			t.Errorf("Expected error to be %s, got %v", expected, err)
+		}
+	})
+}

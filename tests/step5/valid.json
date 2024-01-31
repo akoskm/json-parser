@@ -1,0 +1,27 @@
+{
+  "id": 1,
+  "parent_id": null,
+  "name": "root",
+  "children": [
+    {
+      "id": 2,
+      "parent_id": 1,
+      "name": "child1",
+      "children": [
+        {
+          "id": 3,
+          "parent_id": 2,
+          "name": "child2",
+          "children": [
+            {
+              "id": 4,
+              "parent_id": 3,
+              "name": "child3",
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
