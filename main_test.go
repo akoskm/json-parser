@@ -48,3 +48,20 @@ func TestMainStep3Invalid(t *testing.T) {
 		}
 	})
 }
+
+func TestMainStep4Valid(t *testing.T) {
+	t.Run("parseJSON2", func(t *testing.T) {
+		parseJSON2("./tests/step4/valid.json")
+		parseJSON2("./tests/step4/valid2.json")
+	})
+}
+
+func TestMainStep4Invalid(t *testing.T) {
+	t.Run("parseJSON2", func(t *testing.T) {
+		expected := "unexpected character l on line 7"
+		_, err := parseJSON2("./tests/step4/invalid.json")
+		if err.Error() != expected {
+			t.Errorf("Expected error to be %s, got %v", expected, err)
+		}
+	})
+}

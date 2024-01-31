@@ -77,10 +77,6 @@ func parseJSON2(filename string) (bool, error) {
 				result += parsedChar
 			}
 			fmt.Println("found name or value", result)
-		case ",":
-			if previousChar != "\"" {
-				invalid = true
-			}
 		default:
 			if unicode.IsSpace(readRune) {
 				continue
